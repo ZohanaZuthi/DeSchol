@@ -11,14 +11,31 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
 
+const corsOptions = {
+    origin: 'https://localhost:5173',
+    credentials: true,
+  };
+  
+app.use(cors(corsOptions)); // add CORS middleware
+  
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+
+
 app.get("/", (req, res) => {
-    res.send("Backend is live 🎉");
+    return res.status(200).json(
+        {
+            message: "I am coming from backend",
+            success: true
+        }
+    )
   });
+
+
   
   
