@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const scholarshipSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: String,
+  eligibility: String,
+  deadline: Date,
+  fundingAmount: Number,
+  applicationLink: String,
+}, { _id: false });
+
 const universitySchema = new mongoose.Schema({
   name: {
     type: String,
@@ -11,6 +20,16 @@ const universitySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  country: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  ranking: {
+    type: Number,
+    required: true,
+    min: 1,
+  },
   website: {
     type: String,
     required: true,
@@ -18,26 +37,33 @@ const universitySchema = new mongoose.Schema({
     lowercase: true,
     validate: {
       validator: (v) => /^https?:\/\/.+/.test(v),
-      message: "Please enter a valid website URL (must start with http/https)",
+      message: "Website must start with http or https",
     },
   },
-  description: {
+  logoUrl: {
     type: String,
     required: true,
     trim: true,
   },
-  country: {
+  description: {
     type: String,
-    trim: true,
+    required: true,
   },
-  ranking: {
+  acceptsInternationalStudents: {
+    type: Boolean,
+    default: true,
+  },
+  intakePeriods: [String], // e.g., ["Fall 2025", "Spring 2026"]
+  applicationFee: {
     type: Number,
-    min: 1,
   },
-  logoUrl: {
-    type: String,
-    trim: true,
+  languageRequirements: {
+    ielts: { type: Number }, // e.g., 6.5
+    gre: { type: Number },   // e.g., 310
+    otherLanguages: [String], // e.g., ["TOEFL", "Duolingo"]
   },
+  languagesOfInstruction: [String], // e.g., ["English", "French"]
+  scholarships: [scholarshipSchema],
   createdAt: {
     type: Date,
     default: Date.now,

@@ -38,6 +38,7 @@ export const registerUser=async(req,res)=>{
             
             const tokenData={userId:user._id};
             const token=jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:"1d"});
+            const userResponse={_id:user._id,fullname:user.fullname,email:user.email,phoneNumber:user.phoneNumber,role:user.role,profile:user.profile};
             res.cookie("token",token,{maxAge:24*60*60*1000,httpOnly:true,sameSite:'strict'});
             res.status(200).json({message:"Login successful",success:true});
         }
@@ -45,4 +46,62 @@ export const registerUser=async(req,res)=>{
             console.error(error);
             res.status(500).json({message:"Internal server error",success:false});
         }
+    }
+
+    export const logout=async(req,res)=>{
+        try{
+            res.clearCookie("token");
+            res.status(200).json({message:"Logout successful",success:true});
+        }
+        catch(error){
+            console.error(error);
+            res.status(500).json({message:"Internal server error",success:false});
+        }
+    }
+
+    export const updateProfile = async (req, res) => {
+  try {
+    const { fullname, email, phoneNumber, bio, skills, profile } = req.body;
+    const userId = req.id; // from isAuthenticated middleware
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    // Update basic fields
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (bio) user.bio = bio;
+    if (skills) user.skills = skills.split(",").map(skill => skill.trim());
+
+    // Safely merge profile object
+    if (profile && typeof profile === "object") {
+      user.profile = {
+        ...user.profile, // preserve existing values
+        ...profile       // overwrite with new ones
+      };
+    }
+
+    await user.save();
+
+    // Avoid reassigning a const (bug you had earlier)
+    const updatedUser = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      bio: user.bio,
+      skills: user.skills,
+      profile: user.profile
+    };
+
+    res.status(200).json({ message: "Profile updated successfully", user: updatedUser, success: true });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
+
     }
