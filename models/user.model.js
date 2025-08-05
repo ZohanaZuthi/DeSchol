@@ -46,6 +46,19 @@ const userSchema = new mongoose.Schema({
       position: String,
       institutionLocation: String,
     },
+    emailToken: String,
+isVerified: {
+  type: Boolean,
+  default: false
+},
+notifications: [
+  {
+    message: String,
+    type: String,
+    read: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
+  }
+],
   },{timestamps:true});
 //   for adding the updated time and created time automatically
 

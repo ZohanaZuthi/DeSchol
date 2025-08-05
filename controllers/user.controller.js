@@ -1,7 +1,7 @@
 import {User} from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+ import { User } from '../models/user.model.js';
 export const registerUser=async(req,res)=>{
     try {
         const {fullname,email,password,phoneNumber,role}=req.body;
@@ -58,6 +58,21 @@ export const registerUser=async(req,res)=>{
             res.status(500).json({message:"Internal server error",success:false});
         }
     }
+   
+
+export const verifyEmail = async (req, res) => {
+  const { token } = req.query;
+  try {
+    const user = await User.findOne({ emailToken: token });
+    if (!user) return res.status(400).json({ message: 'Invalid token' });
+    user.emailToken = null;
+    user.isVerified = true;
+    await user.save();
+    res.status(200).json({ message: 'Email verified successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Verification failed' });
+  }
+};
 
     export const updateProfile = async (req, res) => {
   try {
